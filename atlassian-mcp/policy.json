@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "name": "atlassian-mcp",
+    "version": "0.1.0",
+    "description": "Capture Atlassian Cloud OAuth tokens on the host for use through the Atlassian auth and Rovo MCP proxy routes."
+  },
+  "open_urls": {
+    "allow_origins": ["https://auth.atlassian.com"],
+    "allow_localhost": true
+  },
+  "credential_providers": {
+    "atlassian_mcp": {
+      "type": "oauth_capture",
+      "token_endpoints": [
+        {
+          "host": "https://auth.atlassian.com",
+          "path": "/oauth/token",
+          "response_fields": [
+            { "path": "access_token", "kind": "opaque" },
+            { "path": "refresh_token", "kind": "opaque" }
+          ],
+          "request_body": "auto",
+          "request_nonce_fields": ["refresh_token"]
+        }
+      ],
+      "api_hosts": ["https://mcp.atlassian.com", "https://auth.atlassian.com"]
+    }
+  },
+  "credential_routes": [
+    { "name": "atlassian_mcp", "provider": "atlassian_mcp" }
+  ]
+}

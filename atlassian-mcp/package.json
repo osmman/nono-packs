@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "name": "atlassian-mcp",
+  "version": "0.1.0",
+  "description": "Sandboxed OAuth for the Atlassian Rovo MCP server",
+  "license": "Apache-2.0",
+  "platforms": ["linux", "macos"],
+  "min_nono_version": "0.82.0",
+  "artifacts": [
+    { "type": "profile", "path": "policy.json", "install_as": "atlassian-mcp" }
+  ]
+}

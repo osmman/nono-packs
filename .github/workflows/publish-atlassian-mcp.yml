@@ -1,0 +1,57 @@
+name: Atlassian MCP pack
+
+on:
+  pull_request:
+    paths:
+      - atlassian-mcp/**
+      - tests/atlassian-mcp.sh
+      - .github/workflows/publish-atlassian-mcp.yml
+  push:
+    tags: ['atlassian-mcp-v*']
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.manifest.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install nono 0.82.0 for profile validation
+        working-directory: ${{ runner.temp }}
+        run: |
+          curl -fsSLo nono.tar.gz https://github.com/nolabs-ai/nono/releases/download/v0.82.0/nono-v0.82.0-x86_64-unknown-linux-gnu.tar.gz
+          echo '81d7a5616622dcf68ca0ed2b7e6b3af08c1216fb0c42dc6d7ecfbd2bbf2d3f50  nono.tar.gz' | sha256sum --check
+          tar -xzf nono.tar.gz nono
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+      - run: bash tests/atlassian-mcp.sh
+      - name: Check release version
+        id: manifest
+        run: |
+          version=$(jq -er '.version' atlassian-mcp/package.json)
+          if [[ "$GITHUB_REF_TYPE" == tag && "$GITHUB_REF_NAME" != "atlassian-mcp-v$version" ]]; then
+            echo "::error::Tag must match the manifest version ($version)"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  publish:
+    needs: validate
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: nolabs-ai/agent-sign@a3641a5e9f14fdfc7d12bacec63d5f56f4fa1749
+        with:
+          publish: 'true'
+          nono-version: v0.82.0
+          package-namespace: osmman
+          package-name: atlassian-mcp
+          package-version: ${{ needs.validate.outputs.version }}
+          package-path: atlassian-mcp
+          files: package.json policy.json README.md
