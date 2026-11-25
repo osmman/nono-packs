@@ -12,7 +12,7 @@ is an independently versioned registry pack.
 1. In the [registry](https://registry.nono.sh/publish), create `osmman/atlassian-mcp`
    with source `osmman/nono-packs` and subpath `atlassian-mcp`. With registry
    2FA enabled, register the trusted publisher for that repository, workflow
-   `.github/workflows/publish-atlassian-mcp.yml`, and ref `refs/tags/atlassian-mcp-v*`.
+   `.github/workflows/publish.yml`, and ref `refs/tags/atlassian-mcp-v*`.
 2. Run `bash tests/atlassian-mcp.sh` from the repository root and complete the
    [manual OAuth check](#manual-oauth-check).
 3. Set the release version in `atlassian-mcp/package.json` and `policy.json`.

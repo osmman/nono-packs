@@ -5,7 +5,7 @@ on:
     paths:
       - atlassian-mcp/**
       - tests/atlassian-mcp.sh
-      - .github/workflows/publish-atlassian-mcp.yml
+      - .github/workflows/publish.yml
   push:
     tags: ['atlassian-mcp-v*']
 
